@@ -1,0 +1,30 @@
+version: "3.5"
+services:
+   rabbitmq-service:
+     image: ruofanxing/rabbitmq-3.8-stomp
+     container_name: rabbitmq-service
+     restart: always
+     volumes:
+       - ${PWD}/data/rabbitmq:/var/lib/rabbitmq
+     networks:
+       - frontend
+   nginx-stompssl-service:
+     container_name: nginx-stompssl-service
+     depends_on:
+       - rabbitmq-service
+     image: nginx
+     volumes:
+       - ${PWD}/nginx/conf.d:/etc/nginx/conf.d
+       - ${PWD}/nginx/ssl:/etc/nginx/ssl
+     ports:
+       - "80:80"
+       - "443:443"
+       - "5672:5672"
+       - "15672:15672"
+     restart: always
+     networks:
+       - frontend
+networks:
+  frontend:
+    name: net-rabbitmq
+    driver: bridge
